@@ -42,16 +42,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
             EventEmitter = require('events');
             instances = [];
             urls = [
-                '',
-                'https:/www.google.com',
+                'https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes',
+                'https://www.google.com',
                 'https://en.wikipedia.org/wiki/China'
             ];
             for (i = 0; i < 3; i++) {
-                chrome = new Chrome("inst" + i);
+                chrome = new Chrome();
                 instances[i] = {
                     chrome: chrome,
                     url: urls[i]
                 };
+                instances[i].chrome.tag = urls[i].split('/')[1];
             }
             instances.forEach(function (inst) {
                 var chrome = inst.chrome;

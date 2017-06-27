@@ -36,16 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var Chrome = (function () {
-    function Chrome(name) {
-        if (name === void 0) { name = 'unassigned'; }
-        this.name = name;
+    function Chrome() {
         this.fs = require('fs');
         this.path = require('path');
         this.Jimp = require('jimp');
         this.utils = require('./utils');
         this.interface = require('chrome-remote-interface');
         this.launcher = require('lighthouse/chrome-launcher/chrome-launcher');
-        this.screenshotsDir = "screenshots-" + name;
         var EventEmitter = require('events');
         this.EE = new EventEmitter();
         this.init();
@@ -150,70 +147,83 @@ var Chrome = (function () {
     };
     Chrome.prototype.capture_page = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var RESULT, DOC_LENGTH, ITER_COUNT, REMAINS, data, i, data_1, data, err_1;
+            var RESULT, DOC_LENGTH, ITER_COUNT, REMAINS, container, data, i, data_1, image_1, data, image, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 16, 17, 19]);
-                        return [4 /*yield*/, this.utils.rmdir("./" + this.screenshotsDir)];
+                        _a.trys.push([0, 19, 20, 22]);
+                        return [4 /*yield*/, this.utils.rmdir("./screenshots/" + this.tag)];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, this.utils.mkdir(this.path.resolve("./" + this.screenshotsDir))];
+                        return [4 /*yield*/, this.utils.mkdir(this.path.resolve("./screenshots/" + this.tag))];
                     case 2:
                         _a.sent();
                         return [4 /*yield*/, this.clear_cookie_banner()];
                     case 3:
                         _a.sent();
-                        return [4 /*yield*/, this.Runtime.evaluate({ expression: 'document.body.scrollHeight' })];
+                        return [4 /*yield*/, this.Runtime.evaluate({ expression: "document.body.style.overflow = 'hidden'" })];
                     case 4:
+                        _a.sent();
+                        return [4 /*yield*/, this.Runtime.evaluate({ expression: 'document.body.scrollHeight' })];
+                    case 5:
                         RESULT = _a.sent();
                         DOC_LENGTH = RESULT.result.value;
                         ITER_COUNT = Math.floor(DOC_LENGTH / 768);
-                        REMAINS = Math.floor(768 * (ITER_COUNT - Math.floor(ITER_COUNT)));
-                        if (!(ITER_COUNT === 1)) return [3 /*break*/, 6];
+                        REMAINS = Math.floor(768 * ((DOC_LENGTH / 768) - Math.floor(ITER_COUNT)));
+                        container = [];
+                        if (!(ITER_COUNT === 1)) return [3 /*break*/, 7];
                         return [4 /*yield*/, this.Page.captureScreenshot()];
-                    case 5:
-                        data = (_a.sent()).data;
-                        this.fs.writeFileSync(this.screenshotsDir + "/result.png", Buffer.from(data, 'base64'));
-                        return [3 /*break*/, 15];
                     case 6:
-                        i = 1;
-                        _a.label = 7;
+                        data = (_a.sent()).data;
+                        this.fs.writeFileSync(this.screenshotsDir + "/result.jpg", Buffer.from(data, 'base64'));
+                        return [3 /*break*/, 18];
                     case 7:
-                        if (!(i < ITER_COUNT)) return [3 /*break*/, 11];
-                        return [4 /*yield*/, this.Page.captureScreenshot()];
+                        i = 1;
+                        _a.label = 8;
                     case 8:
-                        data_1 = (_a.sent()).data;
-                        this.fs.writeFileSync(this.screenshotsDir + "/current" + i + ".png", Buffer.from(data_1, 'base64'));
-                        return [4 /*yield*/, this.Runtime.evaluate({ expression: 'window.scroll(0, 768)' })];
+                        if (!(i <= ITER_COUNT)) return [3 /*break*/, 13];
+                        return [4 /*yield*/, this.Page.captureScreenshot()];
                     case 9:
-                        _a.sent();
-                        _a.label = 10;
+                        data_1 = (_a.sent()).data;
+                        return [4 /*yield*/, this.Jimp.read(Buffer.from(data_1, 'base64'))];
                     case 10:
-                        i++;
-                        return [3 /*break*/, 7];
-                    case 11: return [4 /*yield*/, this.Emulation.setVisibleSize({ width: 1366, height: REMAINS })];
+                        image_1 = _a.sent();
+                        container.push(image_1);
+                        return [4 /*yield*/, this.Runtime.evaluate({ expression: "window.scroll(0, " + 768 * i + ")" })];
+                    case 11:
+                        _a.sent();
+                        _a.label = 12;
                     case 12:
+                        i++;
+                        return [3 /*break*/, 8];
+                    case 13: return [4 /*yield*/, this.Emulation.setVisibleSize({ width: 1366, height: REMAINS })];
+                    case 14:
                         _a.sent();
                         return [4 /*yield*/, this.Emulation.forceViewport({ x: 0, y: (DOC_LENGTH - REMAINS), scale: 1 })];
-                    case 13:
+                    case 15:
                         _a.sent();
                         return [4 /*yield*/, this.Page.captureScreenshot()];
-                    case 14:
-                        data = (_a.sent()).data;
-                        this.fs.writeFileSync(this.screenshotsDir + "/current" + i + ".png", Buffer.from(data, 'base64'));
-                        this.stitch_page(ITER_COUNT);
-                        _a.label = 15;
-                    case 15: return [3 /*break*/, 19];
                     case 16:
+                        data = (_a.sent()).data;
+                        return [4 /*yield*/, this.Jimp.read(Buffer.from(data, 'base64'))];
+                    case 17:
+                        image = _a.sent();
+                        container.push(image);
+                        _a.label = 18;
+                    case 18: return [3 /*break*/, 22];
+                    case 19:
                         err_1 = _a.sent();
                         console.error(err_1);
-                        return [3 /*break*/, 19];
-                    case 17: return [4 /*yield*/, this.kill()];
-                    case 18:
+                        return [3 /*break*/, 22];
+                    case 20:
+                        if (ITER_COUNT !== 1) {
+                            this.stitch_page(ITER_COUNT, container);
+                        }
+                        return [4 /*yield*/, this.kill()];
+                    case 21:
                         _a.sent();
                         return [7 /*endfinally*/];
-                    case 19: return [2 /*return*/];
+                    case 22: return [2 /*return*/];
                 }
             });
         });
@@ -230,51 +240,60 @@ var Chrome = (function () {
             });
         });
     };
-    Chrome.prototype.stitch_page = function (count, imagePath) {
-        if (imagePath === void 0) { imagePath = "./" + this.screenshotsDir + "/current1.png"; }
+    Chrome.prototype.stitch_page = function (count, container) {
         return __awaiter(this, void 0, void 0, function () {
-            var img;
+            var blitted, spare_item, temp_image;
             return __generator(this, function (_a) {
-                if (count > 10) {
-                    // WILL MERGE SORT BLIT
-                    // for () {
-                    //     let img = stitcher(count, imagePath = `./${this.screenshotsDir}/current1.png`)
-                    // }
+                switch (_a.label) {
+                    case 0:
+                        blitted = [];
+                        if (container.length % 2 === 0) {
+                            spare_item = container.pop();
+                        }
+                        _a.label = 1;
+                    case 1: return [4 /*yield*/, this.stitcher(container[0], container[1], blitted)];
+                    case 2:
+                        _a.sent();
+                        container.splice(0, 1);
+                        container.splice(0, 1);
+                        if (!(container.length === 1)) return [3 /*break*/, 4];
+                        temp_image = blitted[blitted.length - 1];
+                        blitted.splice(blitted.length - 1, 1);
+                        return [4 /*yield*/, this.stitcher(temp_image, container[0], blitted)];
+                    case 3:
+                        _a.sent();
+                        container.splice(0, 1);
+                        container = blitted;
+                        blitted = [];
+                        return [3 /*break*/, 5];
+                    case 4:
+                        if (container.length < 1) {
+                            container = blitted;
+                            blitted = [];
+                        }
+                        _a.label = 5;
+                    case 5:
+                        if (container.length != 1) return [3 /*break*/, 1];
+                        _a.label = 6;
+                    case 6:
+                        container[0].quality(30).write("./" + this.screenshotsDir + "/result.jpg");
+                        return [2 /*return*/];
                 }
-                else {
-                    img = stitcher(count, imagePath = "./" + this.screenshotsDir + "/current1.png");
-                    img.write("./" + this.screenshotsDir + "/result.png");
-                }
-                return [2 /*return*/];
             });
         });
     };
-    Chrome.prototype.stitcher = function () {
+    Chrome.prototype.stitcher = function (image1, image2, result_arr) {
         return __awaiter(this, void 0, void 0, function () {
-            var img, _loop_1, this_1, i;
+            var current_height;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.Jimp.read(imagePath)];
-                    case 1:
-                        img = _a.sent();
-                        _loop_1 = function (i) {
-                            var next_img;
-                            this_1.Jimp.read("./" + this_1.screenshotsDir + "/current" + (i + 1) + ".png", function (e, img) {
-                                if (e)
-                                    throw e;
-                                img.quality(50);
-                                next_img = img;
-                            });
-                            img
-                                .contain(img.bitmap.width, (img.bitmap.height + next_img.bitmap.height), this_1.Jimp.VERTICAL_ALIGN_TOP)
-                                .blit(next_img, 0, (img.bitmap.height - next_img.bitmap.height));
-                        };
-                        this_1 = this;
-                        for (i = 1; i < count; i++) {
-                            _loop_1(i);
-                        }
-                        return [2 /*return*/, img];
-                }
+                current_height = image1.bitmap.height;
+                image1
+                    .contain(image1.bitmap.width, (image1.bitmap.height + image2.bitmap.height), this.Jimp.VERTICAL_ALIGN_TOP)
+                    .blit(image2, 0, current_height, function (err, image) {
+                    image;
+                    result_arr.push(image);
+                });
+                return [2 /*return*/];
             });
         });
     };

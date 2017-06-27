@@ -3,18 +3,19 @@
     var EventEmitter = require('events');
     var instances = [];
     var urls = [
-        '',
-        'https:/www.google.com',
+        'https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes',
+        'https://www.google.com',
         'https://en.wikipedia.org/wiki/China'
     ]
 
 
     for (let i = 0; i < 3; i++) {
-        let chrome = new Chrome(`inst${i}`);
+        let chrome = new Chrome();
         instances[i] = {
             chrome: chrome,
             url: urls[i]
         }
+        instances[i].chrome.tag = urls[i].split('/')[1];
     }
 
     instances.forEach((inst) => {
@@ -38,11 +39,13 @@
     //     });
     // });
 
+    // var c = new Chrome();
+
     // c.EE.on('initialised', () => {
-    //     c.Page.navigate({ url: '' });
+    //     c.Page.navigate({ url: 'https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Classes' });
 
     //     c.Page.loadEventFired(async () => {
-    //         c.capture_page();
+    //         await c.capture_page();
     //     });
     // });
 
